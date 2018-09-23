@@ -79,7 +79,7 @@ module.exports = function(app){
         _googleImagesLook = []
       }
       else{
-        _googleImagesLook = results[1].slice(0, 10).map((imageData, imageIndex) => {
+        _googleImagesLook = results[1].slice(1, 12).map((imageData, imageIndex) => {
           return imageData.url
         })
       }
@@ -97,7 +97,7 @@ module.exports = function(app){
       //   }
       // }
 
-      let urls = _googleImagesLook.concat(_igImages)
+      let urls = _googleImagesLook
       
       let resp = {
         name: textSearch,
