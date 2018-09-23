@@ -25,7 +25,8 @@ module.exports = function(app){
     const client = new GoogleImages(process.env.CSEID, process.env.APIKEY);
     
     let options = {
-      imgSize: 'small'
+      imgSize: 'small',
+      imgtype: "image/jpg"
     }
     
     let promiseGoogleImagesWallPaper = new Promise((resolve, reject) => {
@@ -38,6 +39,14 @@ module.exports = function(app){
 
     let promiseGoogleImagesLook = new Promise((resolve, reject) => {
       client.search(textSearch + ' roupa', options).then(result => {
+        resolve(result)
+      }).catch(e => {
+        resolve('ERRO')
+      })
+    })
+
+    let promiseGoogleImagesSimilares = new Promise((resolve, reject) => {
+      client.search(textSearch + ' similares', options).then(result => {
         resolve(result)
       }).catch(e => {
         resolve('ERRO')
@@ -60,12 +69,13 @@ module.exports = function(app){
 
     // })
 
-    Promise.all([promiseGoogleImagesWallPaper, promiseGoogleImagesLook]).then((results) => {
+    Promise.all([promiseGoogleImagesWallPaper, promiseGoogleImagesLook, promiseGoogleImagesSimilares]).then((results) => {
 
       console.log(results)
               
       let _googleImagesWallpaper
       let _googleImagesLook
+      let _googleImagesSimilares
       let _igImages
 
       if(results[0] == 'ERRO'){
@@ -84,6 +94,15 @@ module.exports = function(app){
         })
       }
 
+      if(results[2] == 'ERRO'){
+        _googleImagesSimilares = []
+      }
+      else{
+        _googleImagesSimilares = results[2].slice(1, 12).map((imageData, imageIndex) => {
+          return imageData.url
+        })
+      }
+
       // if(results[1] == 'ERRO' || results[1] == undefined){
       //   _igImages = []
       // }
@@ -97,12 +116,13 @@ module.exports = function(app){
       //   }
       // }
 
-      let urls = _googleImagesLook
+      // let urls = _googleImagesLook
       
       let resp = {
         name: textSearch,
         "image-hero": _googleImagesWallpaper,
-        looks: urls
+        looks: _googleImagesLook,
+        similars: _googleImagesSimilares
       }
 
       res.send(resp)
