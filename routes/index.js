@@ -256,7 +256,7 @@ module.exports = function(app){
 
       if(err) throw err
       
-      res.send(data)
+      res.json({data})
       
     })
 
