@@ -3,3 +3,14 @@ extends layout
 block content
   h1= title
   p Welcome to #{title}
+
+  form(method="post" id="frm_upload_doc_v3" enctype="multipart/form-data" action="upload")
+    //- input(class='form-control' type='file' name='file_doc' id='file_doc' accept=".jpg,.jpeg,.png,.tiff")
+    input(class='form-control' type='file' name='file_doc_v3' id='file_doc_v3' multiple)
+    br
+    h4(id='status_upload_batch')
+    strong(id='date_time_upload_batch')
+    div(id="container_last_downloads")
+        h5 Ultimos Uploads
+        ul(id='last_downloads')
+    input(class='btn btn-success' type='submit' value='enviar' id='btn_enviar_v3')
