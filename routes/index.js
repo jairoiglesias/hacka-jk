@@ -235,8 +235,9 @@ module.exports = function(app){
       if(err) throw err
 
       console.log('image product saved!')
-      console.log(_uuid)
-      res.send(_uuid)
+      console.log({_uuid})
+
+      res.json({_uuid})
 
     })
     
