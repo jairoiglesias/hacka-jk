@@ -20,8 +20,6 @@ module.exports = function(app){
   
   app.get('/images/:text', (req, res) => {
   
-    console.log('accessToken: ' + accessToken)
-  
     let textSearch = req.params.text
   
     const client = new GoogleImages(process.env.CSEID, process.env.APIKEY);
@@ -30,16 +28,33 @@ module.exports = function(app){
       imgSize: 'medium'
     }
   
-    client.search(textSearch, options).then(images => {
+    client.search(textSearch, options).then(googleImages => {
   
-      igScrap.scrapeTag(textSearch).then(function(result){
+      igScrap.scrapeTag(textSearch).then(function(igImages){
+
+        // let resp = {
+        //   google: googleImages,
+        //   instagram: igImages
+        // }
+              
+        let _googleImages = googleImages.slice(0, 10).map((imageData, imageIndex) => {
+          return imageData.url
+        })
+        
+        let _igImages = igImages.medias.slice(0, 10).map((imageData, imageIndex) => {
+          return imageData.display_url
+        })
+
+        let urls = _googleImages.concat(_igImages)
         
         let resp = {
-          google: images,
-          instagram: result
+          name: textSearch,
+          "image-hero": urls[0],
+          looks: urls
         }
-  
+
         res.send(resp)
+
       })
   
   
