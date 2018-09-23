@@ -46,7 +46,7 @@ module.exports = function(app){
     })
 
     let promiseGoogleImagesSimilares = new Promise((resolve, reject) => {
-      client.search(textSearch + ' similares', options).then(result => {
+      client.search('pessoas famosas roupass', options).then(result => {
         resolve(result)
       }).catch(e => {
         resolve('ERRO')
@@ -223,5 +223,44 @@ module.exports = function(app){
     })
 
   })
+
+  app.post('/upload_product', (req, res) => {
+
+    let _uuid = uuid.v4()
+
+    let data = req.body.base64
+
+    fs.writeFile('./uploads/' + _uuid, data, (err) => {
+
+      if(err) throw err
+
+      console.log('image product saved!')
+      res.send(_uuid)
+
+    })
+    
+  })
+
+  app.get('/get_image_product/:uuid', (req, res) => {
+    
+    var _uuid = req.params.uuid
+
+    var imagemPath = './uploads/'+_uuid
+
+    // Configura o retorno do content
+    // res.set('Content-Type', 'image/jpg')
+
+    // Efetua leitura da imagem
+    fs.readFile(imagemPath, function(err, data) {
+
+      if(err) throw err
+      
+      res.send(data)
+      
+    })
+
+  })
+
+
 }
 
