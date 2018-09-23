@@ -20,7 +20,7 @@ module.exports = function(app){
   
   app.get('/images/:text', (req, res) => {
   
-    let textSearch = req.params.text + ' look'
+    let textSearch = req.params.text
   
     const client = new GoogleImages(process.env.CSEID, process.env.APIKEY);
     
@@ -28,8 +28,16 @@ module.exports = function(app){
       imgSize: 'medium'
     }
     
-    let promiseGoogleImages = new Promise((resolve, reject) => {
-      client.search(textSearch, options).then(result => {
+    let promiseGoogleImagesWallPaper = new Promise((resolve, reject) => {
+      client.search(textSearch + ' wallpaper', options).then(result => {
+        resolve(result)
+      }).catch(e => {
+        resolve('ERRO')
+      })
+    })
+
+    let promiseGoogleImagesLook = new Promise((resolve, reject) => {
+      client.search(textSearch + ' look', options).then(result => {
         resolve(result)
       }).catch(e => {
         resolve('ERRO')
@@ -52,40 +60,48 @@ module.exports = function(app){
 
     // })
 
-    Promise.all([promiseGoogleImages]).then((results) => {
+    Promise.all([promiseGoogleImagesWallPaper, promiseGoogleImagesLook]).then((results) => {
 
       console.log(results)
               
+      let _googleImagesWallpaper
+      let _googleImagesLook
       let _igImages
-      let _googleImages
 
       if(results[0] == 'ERRO'){
-        _googleImages = []
+        _googleImagesWallpaper = []
       }
       else{
-        _googleImages = results[0].slice(0, 10).map((imageData, imageIndex) => {
+        _googleImagesWallpaper = results[0][0].url
+      }
+
+      if(results[1] == 'ERRO'){
+        _googleImagesLook = []
+      }
+      else{
+        _googleImagesLook = results[1].slice(0, 10).map((imageData, imageIndex) => {
           return imageData.url
         })
       }
 
-      if(results[1] == 'ERRO' || results[1] == undefined){
-        _igImages = []
-      }
-      else{
+      // if(results[1] == 'ERRO' || results[1] == undefined){
+      //   _igImages = []
+      // }
+      // else{
 
-        if(results[1].medias != undefined){
+      //   if(results[1].medias != undefined){
           
-          _igImages = results[1].medias.slice(0, 10).map((imageData, imageIndex) => {
-            return imageData.display_url
-          })
-        }
-      }
+      //     _igImages = results[1].medias.slice(0, 10).map((imageData, imageIndex) => {
+      //       return imageData.display_url
+      //     })
+      //   }
+      // }
 
-      let urls = _googleImages.concat(_igImages)
+      let urls = _googleImagesLook.concat(_igImages)
       
       let resp = {
         name: textSearch,
-        "image-hero": urls[0],
+        "image-hero": _googleImagesWallpaper,
         looks: urls
       }
 
