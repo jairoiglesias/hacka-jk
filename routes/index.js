@@ -20,7 +20,7 @@ module.exports = function(app){
   
   app.get('/images/:text', (req, res) => {
   
-    let textSearch = req.params.text
+    let textSearch = req.params.text + ' look'
   
     const client = new GoogleImages(process.env.CSEID, process.env.APIKEY);
     
@@ -36,23 +36,23 @@ module.exports = function(app){
       })
     })
 
-    let promiseIgScrap = new Promise((resolve, reject) => {
+    // let promiseIgScrap = new Promise((resolve, reject) => {
       
-      try{
+    //   try{
         
-        igScrap.scrapeTag(textSearch).then(result => {
-          resolve(result)
-        }).catch(e => {
-          resolve('ERRO')
-        })
-      }
-      catch(error){
-        console.log('error **')
-      }
+    //     igScrap.scrapeTag(textSearch).then(result => {
+    //       resolve(result)
+    //     }).catch(e => {
+    //       resolve('ERRO')
+    //     })
+    //   }
+    //   catch(error){
+    //     console.log('error **')
+    //   }
 
-    })
+    // })
 
-    Promise.all([promiseGoogleImages, promiseIgScrap]).then((results) => {
+    Promise.all([promiseGoogleImages]).then((results) => {
 
       console.log(results)
               
@@ -68,13 +68,17 @@ module.exports = function(app){
         })
       }
 
-      if(results[1] == 'ERRO'){
+      if(results[1] == 'ERRO' || results[1] == undefined){
         _igImages = []
       }
       else{
-        _igImages = results[1].medias.slice(0, 10).map((imageData, imageIndex) => {
-          return imageData.display_url
-        })
+
+        if(results[1].medias != undefined){
+          
+          _igImages = results[1].medias.slice(0, 10).map((imageData, imageIndex) => {
+            return imageData.display_url
+          })
+        }
       }
 
       let urls = _googleImages.concat(_igImages)
@@ -93,7 +97,7 @@ module.exports = function(app){
       console.log('=======================')
       console.log(e)
       console.log('=======================')
-      
+
       res.send('Erro')
 
     })
