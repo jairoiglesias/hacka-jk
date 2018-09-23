@@ -25,7 +25,7 @@ module.exports = function(app){
     const client = new GoogleImages(process.env.CSEID, process.env.APIKEY);
     
     let options = {
-      imgSize: 'medium'
+      imgSize: 'small'
     }
     
     let promiseGoogleImagesWallPaper = new Promise((resolve, reject) => {
@@ -37,7 +37,7 @@ module.exports = function(app){
     })
 
     let promiseGoogleImagesLook = new Promise((resolve, reject) => {
-      client.search(textSearch + ' look', options).then(result => {
+      client.search(textSearch + ' roupa', options).then(result => {
         resolve(result)
       }).catch(e => {
         resolve('ERRO')
