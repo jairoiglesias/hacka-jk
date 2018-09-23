@@ -27,38 +27,76 @@ module.exports = function(app){
     let options = {
       imgSize: 'medium'
     }
-  
-    client.search(textSearch, options).then(googleImages => {
-  
-      igScrap.scrapeTag(textSearch).then(function(igImages){
+    
+    let promiseGoogleImages = new Promise((resolve, reject) => {
+      client.search(textSearch, options).then(result => {
+        resolve(result)
+      }).catch(e => {
+        resolve('ERRO')
+      })
+    })
 
-        // let resp = {
-        //   google: googleImages,
-        //   instagram: igImages
-        // }
+    let promiseIgScrap = new Promise((resolve, reject) => {
+      
+      try{
+        
+        igScrap.scrapeTag(textSearch).then(result => {
+          resolve(result)
+        }).catch(e => {
+          resolve('ERRO')
+        })
+      }
+      catch(error){
+        console.log('error **')
+      }
+
+    })
+
+    Promise.all([promiseGoogleImages, promiseIgScrap]).then((results) => {
+
+      console.log(results)
               
-        let _googleImages = googleImages.slice(0, 10).map((imageData, imageIndex) => {
+      let _igImages
+      let _googleImages
+
+      if(results[0] == 'ERRO'){
+        _googleImages = []
+      }
+      else{
+        _googleImages = results[0].slice(0, 10).map((imageData, imageIndex) => {
           return imageData.url
         })
-        
-        let _igImages = igImages.medias.slice(0, 10).map((imageData, imageIndex) => {
+      }
+
+      if(results[1] == 'ERRO'){
+        _igImages = []
+      }
+      else{
+        _igImages = results[1].medias.slice(0, 10).map((imageData, imageIndex) => {
           return imageData.display_url
         })
+      }
 
-        let urls = _googleImages.concat(_igImages)
-        
-        let resp = {
-          name: textSearch,
-          "image-hero": urls[0],
-          looks: urls
-        }
+      let urls = _googleImages.concat(_igImages)
+      
+      let resp = {
+        name: textSearch,
+        "image-hero": urls[0],
+        looks: urls
+      }
 
-        res.send(resp)
+      res.send(resp)
 
-      })
-  
-  
-    });
+
+    }).catch((e) => {
+
+      console.log('=======================')
+      console.log(e)
+      console.log('=======================')
+      
+      res.send('Erro')
+
+    })
   
   })
   
